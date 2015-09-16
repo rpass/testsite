@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+{% load staticfiles %}
+  <title>Basic sigma.js example</title>
+  <style type="text/css">
+    body {
+      margin: 0;
+    }
+    #container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  <script src="{% static "js/sigma.min.js" %}"></script>
+  <script>
+    // Let's first initialize sigma:
+    var s = new sigma('container');
+    // var nodeList = [
+    //   {id: 'n'+i, label: 'label'+i, x: 0, y: 1, size: 1, color: '#f00'}
+    // ];
+    // Then, let's add some data to display:
+    //s.graph.addNode({
+
+    var N = 100;
+    var E = 500;
+    var i;
+
+    // generate random nodes
+    for(i = 0; i < N; i++){
+      s.graph.addNode({
+        'id': 'n'+i,
+        'x': Math.random(),
+        'y': Math.random(),
+        'size': 0.5+4.5*Math.random(),
+        'label': 'label' + i,
+        'color': 'rgb('+Math.round(Math.random()*256)+','+
+                        Math.round(Math.random()*256)+','+
+                        Math.round(Math.random()*256)+')',
+      });
+    }
+   
+    // generate random edges
+    for(i = 0; i < E; i++){
+        s.graph.addEdge({
+          id: 'e'+i,
+          source: 'n'+(Math.random()*N|0),
+          target: 'n'+(Math.random()*N|0),
+      });
+    }
+
+    s.settings({
+    edgeColor: 'default',
+    defaultEdgeColor: 'rgb(230,230,230)',
+    });
+
+    // Finally, let's ask our sigma instance to refresh:
+    s.refresh();
+  </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>My Crossfilter Demo</title>
+	{% load staticfiles %}
+	<meta http-equiv="content-type" content="text/html; charset=UTF8"> 
+	<script type="text/javascript" src="{% static "js/crossfilter.min.js" %}"></script>
+	<script type="text/javascript" src="{% static "js/d3.min.js" %}"></script>
+	<script type="text/javascript" src="{% static "js/dc.min.js" %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% static "css/dc.css" %}" media="screen" /> 
+</head>
+
+<body>
+<div id="chart-space"><h1>Chart Space</h1></div>
+<div style='clear:both;'>
+	<p>This example was done using the following tutorials:
+	<ul>
+		<li>http://blog.rusty.io/2012/09/17/crossfilter-tutorial/</li>
+	</ul></p>
+		<table id="dc-data-table">
+			<thead>
+			<tr class="header">
+				<th>Date</th>
+				<th>x</th>
+				<th>y</th>
+				<th>z</th>
+			</tr>
+			</thead>
+		</table>
+</div>
+
+<script>
+	function print_filter(filter){
+		var f=eval(filter);
+		if (typeof(f.length) != "undefined") {}else{}
+		if (typeof(f.top) != "undefined") {f=f.top(Infinity);}else{}
+		if (typeof(f.dimension) != "undefined") {f=f.dimension(function(d) { return "";}).top(Infinity);}else{}
+		console.log(filter+"("+f.length+") = "+JSON.stringify(f).replace("[","[\n\t").replace(/}\,/g,"},\n\t").replace("]","\n]"));
+	} 
+	d3.csv('{% static "data/gen-data.csv" %}', function (error, data) {
+		data.forEach(function(d) { 
+			d.bytes = +d.bytes;
+			// d.date = new Date(d.date); //May not be necessary, see http://www.w3schools.com/js/js_dates.asp
+		});
+		console.log(data[0]);
+		var gendata = crossfilter(data);
+		console.log("crossfilter size: " + gendata.size());
+
+		// How many bytes have been captured?
+		var n = gendata.groupAll().reduceCount().value();
+		console.log("there were " + n + " flows captured. ");
+
+		var totalBytes = gendata.groupAll().reduceSum(function(d){
+			return d.bytes;
+		}).value();
+		console.log("there were " + totalBytes/1000000000 + " Gbytes captured." );
+
+		var dateDim = gendata.dimension(function(d) { return d.date; });
+		var sumMeasure = dateDim.group().reduceSum(function(d){return d.bytes; });
+		var dates = [11, 12, 13, 14, 15, 16, 17];
+		dates.forEach(function(date){
+			dateDim.filterAll();
+			var datestr = "2015-03-" + date
+			console.log(datestr + " had " + gendata.groupAll().reduceCount().value() + " entries.");
+		});
+		sums = sumMeasure.top(8);
+		sumMeasure.forEach(function(d){ 
+			console.log(d.key + ' ! ' + d.value);
+		});
+		dateDim.filter("2015-03-11");
+		console.log("dateDim['2015-03-11'] has " + gendata.groupAll().reduceCount().value() + " entries.");		
+		console.log("those entries contain " + gendata.groupAll().reduceSum(function(d){ return d.bytes; }).value() + " bytes.");
+
+		// var thatBytes = dateDim.group().reduceSum(function(d){ return d.bytes; });
+		// console.log("thatBytes: " + thatBytes.filter("2015-03-11"));
+	});
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>My 1st (kinda) graph with d3js</title>
+    <meta charset="utf-8">
+	{% load staticfiles %}
+	<script type="text/javascript" src="{% static "js/d3/d3.js" %}"></script>
+    <link rel="shortcut icon" type="image/png" href="{% static "favicon.ico" %}">
+</head>
+<body>
+<div id="graph"></div>
+<style type="text/css">
+	circle {
+		color: black;
+	}
+</style>
+<script type="text/javascript">
+	var vis = d3.select("#graph")
+	            .append("svg")
+				.attr("width", 200)
+				.attr("height", 200);
+
+	var nodes = [
+	    {x: 10, y: 50},
+	    {x: 70, y: 10},
+	    {x: 140, y: 50}   
+	  ]
+
+	vis.selectAll("circle")
+	   .data(nodes)
+	   .enter()
+	   .append("circle")
+	   .attr("class", "node")
+	   .attr("cx", function(d) { return d.x; })
+	   .attr("cy", function(d) { return d.y; })
+	   .attr("r", "10px")
+	   .attr("fill", "black")
+</script>
+</body>
+</html>

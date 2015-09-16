@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+<h1>This is a form page</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="5/vote" method="post">
+{% csrf_token %}
+    <input type="text" name="choice" id="choice" value="Choice" />
+    <label for="choice">choice</label><br />
+<input type="submit" value="Vote" />
+</form>
+</body>
+</html>

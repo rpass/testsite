@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	    {% load staticfiles %}
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <link rel="shortcut icon" type="image/png" href="{% static "favicon.ico" %}">
+        <script type="text/javascript" src="{% static "js/d3/d3.js" %}"></script>
+    </head>
+    <body>
+		<style type="text/css">
+			div.bar {
+				display: inline-block;
+				width: 20px;
+				height: 75px;
+				background-color: teal;
+				margin-right: 2px;
+			}
+	    </style>
+        <script type="text/javascript">
+            // Your beautiful D3 code will go here
+
+            // Adding a p tag with text
+            // d3.select("body").append("p").text("This is a new paragraph!");
+
+            // Defining our data
+            var data = [ 5, 10, 15, 20, 25 ];
+
+            // ------------------------------
+            // EXAMPLE red text for data > 15
+
+            // Please make your selection
+            // Selecting the DOM elements you wish your data to be associated with
+            // d3.select("body").selectAll("p")
+            // 	.data(data)
+            // 	// The magic method
+            // 	// Think of enter as telling d3 what elements you want to exist
+            // 	.enter()
+            // 	.append("p")
+            // 	.text(function(d) { return "! " + d; })
+            // 	.style("color", function(d) {
+            // 		if (d > 15) {
+            // 			return "red";
+            // 		} else {
+            // 			return "black";
+            // 		}
+            // 	});
+
+			// -------------------------------
+			// EXAMPLE basic bar graph
+
+			d3.select("body").selectAll("div")
+				.data(data)
+				.enter()
+				.append("div")
+				.attr("class","bar")
+				.style("height", function(d) {
+					return d*5 + "px";
+				});
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Feasibility Demo</title>
+	{% load staticfiles %}
+	<meta http-equiv="content-type" content="text/html; charset=UTF8"> 
+	<script type="text/javascript" src="{% static "js/crossfilter.min.js" %}"></script>
+	<script type="text/javascript" src="{% static "js/d3.min.js" %}"></script>
+	<script type="text/javascript" src="{% static "js/dc.min.js" %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% static "css/dc.css" %}" media="screen" /> 
+</head>
+<body>
+
+<div id="linechart"></div>
+
+<script type="text/javascript">
+	var data = [
+		{	source: {continent: 'Africa', name: 'n1'}, destination: {continent: 'Africa', name: 'n2'}, timestart: '2015/01/10 00:01:02', size: 5 + 15*Math.random(), traffictype: 'http' },
+		{	source: {continent: 'Africa', name: 'n1'}, destination: {continent: 'Africa', name: 'n2'}, timestart: '2015/01/12 00:01:03', size: 5 + 15*Math.random(), traffictype: 'http' },
+		{	source: {continent: 'Africa', name: 'n1'}, destination: {continent: 'Europe', name: 'n3'}, timestart: '2015/01/15 00:01:05', size: 50, traffictype: 'streaming' },
+		{	source: {continent: 'Africa', name: 'n1'}, destination: {continent: 'Europe', name: 'n4'}, timestart: '2015/02/05 00:01:06', size: 5 + 15*Math.random(), traffictype: 'http' },
+		{	source: {continent: 'Africa', name: 'n1'}, destination: {continent: 'Africa', name: 'n5'}, timestart: '2015/03/20 00:01:06', size: 5 + 15*Math.random(), traffictype: 'http' },
+		{	source: {continent: 'Africa', name: 'n1'}, destination: {continent: 'Africa', name: 'n5'}, timestart: '2015/03/21 00:01:07', size: 5 + 15*Math.random(), traffictype: 'voip' },
+		{	source: {continent: 'Africa', name: 'n1'}, destination: {continent: 'Africa', name: 'n4'}, timestart: '2015/04/05 00:01:08', size: 5 + 15*Math.random(), traffictype: 'voip' },
+	];
+
+	var ndx = crossfilter(data);
+
+	var parseDate = d3.time.format("%Y/%m/%d %H:%M:%S").parse;
+
+	data.forEach(function(d) {
+		d.timestart = parseDate(d.timestart);
+	});
+
+	// create the dimensions for the line chart
+	var timestartDim = ndx.dimension(function(d) {return d.timestart;});
+
+	var hits = timestartDim.group().reduceSum(dc.pluck('size')); 
+
+	var minDate = timestartDim.bottom(1)[0].timestart;
+	var maxDate = timestartDim.top(1)[0].timestart;
+
+	var hitslineChart  = dc.lineChart("#linechart"); 
+
+	// reduceSum by timestart and status codes
+	// var http = timestartDim.group().reduceSum(function(d) { return d.http_200; });
+	// var voip = timestartDim.group().reduceSum(function(d) { return d.http_302; });
+	// var streaming = timestartDim.group().reduceSum(function(d) { return d.http_404; });
+
+	// prepare the line chart
+	hitslineChart
+		.width(500).height(200)
+		.dimension(timestartDim)
+		.group(hits)
+		.x(d3.time.scale().domain([minDate,maxDate]))
+		.brushOn(false)
+		.yAxisLabel("Hits per day");
+
+	// newer better greater line chart
+	// hitslineChart
+	//    .width(500).height(200)
+	//    .dimension(timestartDim)
+	//    .group(status_200,"200")
+	//    .stack(status_302,"302")
+	//    .stack(status_404,"404")   
+	//    .renderArea(true)
+	//    .x(d3.time.scale().domain([minDate,maxDate]))
+	//    .brushOn(false)
+	//    .legend(dc.legend().x(50).y(10).itemHeight(13).gap(5))
+	//    .yAxisLabel("Hits per day");
+
+	dc.renderAll();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>dc.js - Series Example</title>
+    {% load staticfiles %}
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{% static "css/dc.css" %}" media="screen" /> 
+</head>
+<body>
+<p>Example from dc examples: http://dc-js.github.io/dc.js/examples/series.html</p>
+<div id="test"></div>
+
+    <script type="text/javascript" src="{% static "js/crossfilter.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/d3.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/dc.min.js" %}"></script>
+
+<script type="text/javascript">
+
+var chart = dc.lineChart("#test");
+var ndx
+
+d3.csv('{% static "data/gen-data.csv" %}', function(error, gendata) {
+
+  gendata.forEach(function(x) {
+    x.btyes = +x.bytes;
+  });
+
+  var ndx               = crossfilter(gendata),
+      dateDimension     = ndx.dimension(function(d) {return new Date(d.date);}),
+      bytesGroup        = dateDimension.group().reduceSum(function(d) {return d.bytes;});
+
+  chart
+    .width(768)
+    .height(480)
+    .x(d3.scale.linear().domain([new Date("2015-03-11"),new Date("2015-03-18")]))
+    .renderArea(true)
+    .brushOn(false)
+    .renderDataPoints(true)
+    .clipPadding(10)
+    .yAxisLabel("This is the Y Axis!")
+    .dimension(dateDimension)
+    .group(bytesGroup)
+    .yAxis().tickFormat(function(v) { return v/1000000 + "MB";});
+  chart.render();
+
+});
+</script>
+
+</body>
+</html>
